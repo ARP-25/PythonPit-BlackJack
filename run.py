@@ -1,3 +1,37 @@
-# Your code goes here.
-# You can delete these comments, but do not change the name of this file
-# Write your code to expect a terminal of 80 characters wide and 24 rows high
+class Card:
+    """
+
+    """
+    def __init__(self, symbol, value, logo):
+        self.symbol = symbol
+        self.value = value       
+        self.logo = logo
+
+class Deck:
+    """
+
+    """
+    def __init__(self):
+        self.cards = []
+        # Creating Card Objects and appending them to Cards List
+        for symbol in ["Hearts","Diamonds","Clubs","Spades"]:
+            for value in range(2, 11):
+                self.cards.append(Card(symbol, value, str(value)))
+
+            for logo in ["Jack","Queen","King"]:
+                self.cards.append(Card(symbol, 10, logo))
+
+            self.cards.append(Card(symbol, 11, "Ace"))
+
+    def print_cards(self):
+        print(len(self.cards))
+        for card in self.cards:
+            print(f"Symbol: {card.symbol} Logo: {card.logo}")
+
+
+def main():
+    deck = Deck()
+    print(deck.print_cards())
+
+main()
+
