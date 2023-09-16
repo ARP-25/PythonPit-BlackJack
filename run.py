@@ -201,6 +201,9 @@ def main():
     elif dealer.hand_value()==player.hand_value():
         print(f"It's a draw!")
     
-
+    ### validate input
+    ### add credit class
+    ### wrap game test in game function and refactor game function code to make it more readable
+    ### finish doc on class and functions
 main()
 
