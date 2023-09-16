@@ -74,7 +74,7 @@ class Participant:
         """
 
         """
-        print(f"{self.name}'s hand: ")
+        print(f"\n{self.name}'s hand: ")
         for card in self.hand:
             print(card)
         print("\n")
@@ -194,10 +194,10 @@ def main():
     # Show Winner
     if dealer.hand_value() > 21:
         print(f"Player: {player.name} won!")
-    elif dealer.hand_value()<player.hand_value():
+    elif dealer.hand_value()<player.hand_value() and not(player.hand_value()>21):
         print(f"Player: {player.name} won!")
-    elif dealer.hand_value()>player.hand_value():
-        print(f"Player: {player.name} won!")       
+    elif dealer.hand_value()>player.hand_value() and not(dealer.hand_value()>21):
+        print(f"Dealer: {dealer.name} won!")       
     elif dealer.hand_value()==player.hand_value():
         print(f"It's a draw!")
     
