@@ -51,6 +51,47 @@ class Deck:
         else
             print("The deck is empty")
 
+class Participant:
+    """
+
+    """
+    def __innit__(self, name):
+        """
+
+        """
+        self.name = name
+        self.hand = []
+
+    def add_card_to_hand(self, card):
+        """
+
+        """
+        self.hand.append
+
+    def show_hand(self):
+        """
+
+        """
+        print(f"{self.name}'s hand: ")
+        for card in self.hand:
+            print(f" {card.symbol} {card.logo}")
+    
+    def hand_value(self):
+        """
+
+        """
+        hand_value = sum(card.value for card in self.hand)
+            hand_value = sum(card.value for card in self.hand)
+
+        ### Aces will get treated as 1 while: ###
+        num_aces = sum(1 for card in self.hand if card.value == 11)       
+        while hand_value > 21 and num_aces:
+            hand_value -= 10
+            num_aces -= 1
+
+        return hand_value
+
+
 
 def main():
     deck = Deck()
