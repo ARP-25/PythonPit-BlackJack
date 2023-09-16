@@ -10,7 +10,7 @@ class Card:
         self.logo = logo
 
     def __str__(self):
-        return f"Card: {self.symbol} {self.value} {self.logo}"
+        return f"Card: {self.symbol} {self.logo}"
 
 class Deck:
     """
@@ -77,6 +77,7 @@ class Participant:
         print(f"{self.name}'s hand: ")
         for card in self.hand:
             print(card)
+        print("\n")
     
     def hand_value(self):
         """
@@ -100,11 +101,12 @@ class Dealer(Participant):
         """
 
         """
-        print(f"{self.name}'s hand: ")
         if first_card_secret == True:
-            print("   Hidden Card")
+            print(f"{self.name}'s hand: ")
+            print("Card: Hidden Card")
             for card in self.hand[1:]:
                 print(card)
+            print("\n")
         else:
             super().show_hand()
 
@@ -113,10 +115,11 @@ def main():
     ### Test Deck and Card
     deck = Deck()
     print(deck.print_cards())
+    
     print(deck.shuffle())
     print(deck.print_cards())
-    print(deck.draw_card().__str__())
-    print(deck.draw_card().__str__())
+    print(deck.draw_card())
+    print(deck.draw_card())
     print("End test Deck,Card and functions\n")
 
     ### Test Participant
@@ -146,28 +149,57 @@ def main():
     print(dealer.hand_value())
     print("End test Dealer Class and functions\n")
     """
-
     ### Test Game
 
     deck_one = Deck()
-    deck.shuffle()
+    deck_one.shuffle()
 
     player = Player("Ronaldo")
     dealer = Dealer("Bestdealer")
 
     # every player gets two cards
-    for _ in range(2)
-        player.add_card_to_hand(deck.draw_card())
-        dealer.add_card_to_hand(deck.draw_card())
+    for _ in range(2):
+        player.add_card_to_hand(deck_one.draw_card())
+        dealer.add_card_to_hand(deck_one.draw_card())
 
     # showing starting hands
     player.show_hand()
     dealer.show_hand()
 
-    # Player draws card
-    
+    # Player draw card Option
+    while True:
+        draw = input("Do you want to draw a card? (yes/no): \n").lower()
+        if draw == 'yes':
+            player.add_card_to_hand(deck_one.draw_card())
+            player.show_hand()
+            if player.hand_value() > 21:
+                print("You lost! You have more than 21 points.")
+                break
+        elif draw == 'no':
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.\n")
 
-    
+    # Dealer draws cards
+    while dealer.hand_value() < 17:
+        dealer.add_card_to_hand(deck_one.draw_card())
+
+    # Show final hands
+    print("\nRESULTS:\n")
+    print(f"{player.name}'s hand value: {player.hand_value()}")
+    player.show_hand()
+    print("Dealer's hand value:", dealer.hand_value())
+    dealer.show_hand(False)
+
+    # Show Winner
+    if dealer.hand_value() > 21:
+        print(f"Player: {player.name} won!")
+    elif dealer.hand_value()<player.hand_value():
+        print(f"Player: {player.name} won!")
+    elif dealer.hand_value()>player.hand_value():
+        print(f"Player: {player.name} won!")       
+    elif dealer.hand_value()==player.hand_value():
+        print(f"It's a draw!")
     
 
 main()
