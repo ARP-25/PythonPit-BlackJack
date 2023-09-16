@@ -9,6 +9,9 @@ class Card:
         self.value = value       
         self.logo = logo
 
+    def __str__(self):
+        return f"Card: {self.symbol} {self.value} {self.logo}"
+
 class Deck:
     """
 
@@ -46,18 +49,17 @@ class Deck:
         """
 
         """
-        if len(self.cards>0):
-            return self.cards
-        else
+        if len(self.cards)>0:
+            return self.cards.pop()
+        else:
             print("The deck is empty")
 
 class Participant:
     """
 
     """
-    def __innit__(self, name):
+    def __init__(self, name):
         """
-
         """
         self.name = name
         self.hand = []
@@ -66,7 +68,7 @@ class Participant:
         """
 
         """
-        self.hand.append
+        self.hand.append(card)
 
     def show_hand(self):
         """
@@ -74,14 +76,13 @@ class Participant:
         """
         print(f"{self.name}'s hand: ")
         for card in self.hand:
-            print(f" {card.symbol} {card.logo}")
+            print(card)
     
     def hand_value(self):
         """
 
         """
         hand_value = sum(card.value for card in self.hand)
-            hand_value = sum(card.value for card in self.hand)
 
         ### Aces will get treated as 1 while: ###
         num_aces = sum(1 for card in self.hand if card.value == 11)       
@@ -91,15 +92,83 @@ class Participant:
 
         return hand_value
 
+class Player(Participant):
+    pass
 
+class Dealer(Participant):
+    def show_hand(self, first_card_secret = True):
+        """
+
+        """
+        print(f"{self.name}'s hand: ")
+        if first_card_secret == True:
+            print("   Hidden Card")
+            for card in self.hand[1:]:
+                print(card)
+        else:
+            super().show_hand()
 
 def main():
+    """
+    ### Test Deck and Card
     deck = Deck()
     print(deck.print_cards())
     print(deck.shuffle())
     print(deck.print_cards())
+    print(deck.draw_card().__str__())
+    print(deck.draw_card().__str__())
+    print("End test Deck,Card and functions\n")
 
+    ### Test Participant
+    participant = Participant("Oscar")
+    participant.add_card_to_hand(deck.draw_card())
+    participant.add_card_to_hand(deck.draw_card())
+    print("expected output = participant name and cards value")
+    participant.show_hand()
+    print(participant.hand_value())
+    print("End test Participant Class and functions\n")
 
+    ### Test Player
+    player = Player("Henry")
+    player.add_card_to_hand(deck.draw_card())
+    player.add_card_to_hand(deck.draw_card())
+    print("expected output = player name and cards value")
+    player.show_hand()
+    print(player.hand_value())
+    print("End test Player Class and functions\n")
+
+    ### Test Dealer
+    dealer = Dealer("Del Pierro")
+    dealer.add_card_to_hand(deck.draw_card())
+    dealer.add_card_to_hand(deck.draw_card())
+    print("expected output = player name and cards value but first card hidden")
+    dealer.show_hand()
+    print(dealer.hand_value())
+    print("End test Dealer Class and functions\n")
+    """
+
+    ### Test Game
+
+    deck_one = Deck()
+    deck.shuffle()
+
+    player = Player("Ronaldo")
+    dealer = Dealer("Bestdealer")
+
+    # every player gets two cards
+    for _ in range(2)
+        player.add_card_to_hand(deck.draw_card())
+        dealer.add_card_to_hand(deck.draw_card())
+
+    # showing starting hands
+    player.show_hand()
+    dealer.show_hand()
+
+    # Player draws card
+    
+
+    
+    
 
 main()
 
