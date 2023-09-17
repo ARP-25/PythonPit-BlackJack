@@ -92,7 +92,7 @@ class Deck:
         if len(self.cards)>0:
             return self.cards.pop()
         else:
-            print("The deck is empty")
+            print("The deck is empty.")
 
 class Participant:
     """
@@ -250,11 +250,173 @@ class Dealer(Participant):
         else:
             super().show_hand()
 
+def ask_player_draw_card(player, deck):
+    """
+    Prompt the player if they want to draw another card from the deck.
+
+    This function asks the player if they want to draw another card during their turn
+    and prompts for a 'yes' or 'no' response. If the player chooses to draw a card ('yes'),
+    the function adds a card to the player's hand from the deck.
+
+    Parameters:
+    - player (Player): The Player instance representing the current player.
+    - deck (Deck): The Deck instance representing the deck of playing cards.
+
+    Returns:
+    None
+    """
+    while True:
+        try:
+            draw = input("Do you want to draw another card? (yes/no): ").lower()
+            if draw not in ['yes', 'no']:
+                raise ValueError("Invalid input. Please enter 'yes' or 'no'.")
+            
+            if draw == 'yes':
+                player.add_card_to_hand(deck.draw_card())
+                player.show_hand()
+                if player.hand_value() > 21:                
+                    break
+            elif draw == 'no':
+                break
+
+        except ValueError as e:
+            print(str(e) + "\n")
+
+def show_winner(player, dealer):
+    """
+    Determine and display the winner of the round based on the participants' hands.
+
+    This function evaluates the hands of the player and dealer to determine the winner
+    of the round. .
+
+    Parameters:
+    - player (Player): The Player instance representing the player.
+    - dealer (Dealer): The Dealer instance representing the dealer.
+
+    Returns:
+    None
+    """
+    if dealer.hand_value() > 21:
+        print(f"Player: {player.name} won!\n")
+        player.round_won()
+    elif player.hand_value() > 21:
+        print(f"Dealer: {dealer.name} won!\n")
+        player.round_lost()
+    elif dealer.hand_value()<player.hand_value() and not(player.hand_value()>21):
+        print(f"Player: {player.name} won!\n")
+        player.round_won()
+    elif dealer.hand_value()>player.hand_value() and not(dealer.hand_value()>21):
+        print(f"Dealer: {dealer.name} won!\n") 
+        player.round_lost()     
+    elif dealer.hand_value()==player.hand_value():
+        print(f"It's a draw!\n")
+
+def show_final_hands(player, dealer):
+    """
+    Display the final hands and results of a round.
+
+    This function prints the final hands of both the player and the dealer, along
+    with their respective hand values. It displays the results of the round, showing
+    the winner or indicating a draw.
+
+    Parameters:
+    - player (Player): The Player instance representing the player.
+    - dealer (Dealer): The Dealer instance representing the dealer.
+
+    Returns:
+    None
+    """
+    print("\nRESULTS:\n")
+    print(f"{player.name}'s hand value: {player.hand_value()}")
+    player.show_hand()
+    print("Dealer's hand value:", dealer.hand_value())
+    dealer.show_hand(False)
+
+def start_round(player, dealer, deck):   
+    """
+    Start a round of the Blackjack game.
+
+    This function initiates a round by shuffling the deck, prompting the player to
+    place a bet, dealing initial cards to both the player and dealer, allowing the player
+    to draw additional cards, enabling the dealer to draw cards as per the rules,
+    showing the final hands, determining the winner, and updating the player's credits.
+
+    Parameters:
+    - player (Player): The Player instance representing the player.
+    - dealer (Dealer): The Dealer instance representing the dealer.
+    - deck (Deck): The Deck instance representing the deck of cards.
+
+    Returns:
+    None
+    """         
+    deck.shuffle()
+
+    # Ask to place a bet
+    player.place_a_bet()
+
+    # Player and Dealer first two cards
+    for _ in range(2):
+        player.add_card_to_hand(deck.draw_card())
+        dealer.add_card_to_hand(deck.draw_card())
+
+    # Showing the starting Hands
+    player.show_hand()
+    dealer.show_hand()
+
+    # Ask Player draw card
+    ask_player_draw_card(player, deck)
+
+    # Dealer draws cards
+    while dealer.hand_value()<17 and not(player.hand_value()>21):
+        dealer.add_card_to_hand(deck.draw_card())
+
+    # Show final hands
+    show_final_hands(player, dealer)
+
+    # Show Winner
+    show_winner(player, dealer)
+
+def continue_play_option(player):
+    """
+    Prompt the player for their choice to continue playing or leave the table.
+
+    This function checks the player's remaining credits and prompts them to choose
+    whether they want to play another round or leave the table based on their credits.
+
+    Parameters:
+    - player (Player): The Player instance representing the player.
+
+    Returns:
+    bool: True if the player chooses to continue playing, False if they choose to leave.
+    """
+    if player.credits>0:
+        print(f"\nDo you want to play another round or leave the table with {player.credits} $.\nType play to play or random character to leave.")
+        player_choice = input()
+        if player_choice == "play":
+            return True
+        else:
+            return False
+    else:
+        print("You got no money left to play. Start a new game to start again with 1000$.")
+        return False
+
+def validate_player_name(name):
+    """
+    Validate the player's name to ensure it contains only letters and is at most 20 characters long.
+
+    Parameters:
+    - name (str): The name input by the player.
+
+    Returns:
+    bool: True if the name is valid, False otherwise.
+    """
+    return bool(re.match(r'^[a-zA-Z]{1,20}$', name))
+
 def run_game():
     """
     Run a round of the blackjack game.
 
-    The function manages the flow of a round of the blackjack game, including initializing the game,
+    This function manages the flow of a round of the blackjack game, including initializing the game,
     allowing the player to place a bet, dealing cards to the player and dealer,
     managing the player's turn, managing the dealer's turn, determining the winner of the round,
     and updating the player's credits accordingly.
@@ -265,97 +427,34 @@ def run_game():
     None
     """
     first_round = True
-
     while True:
+        # Welcome message, initialize Participants
         if first_round == True:   
             print("\nWelcome to the Black Jack Table. You're entering with a total credit of 1000 $.\n")
-            print("\nUnder which name do you want to be referred to? Please enter below:")
-            player_name = input()
-            player = Player(player_name)
-            dealer = Dealer("Oscar")
-        else:
-            print("\nWelcome to the next round at the Black Jack Table.")
-            for _ in range(len(player.hand)):
-                player.hand.pop()
-            for _ in range(len(dealer.hand)):
-                dealer.hand.pop()
-            
-        deck = Deck()
-        deck.shuffle()
- 
-        # Ask to place a bet
-        player.place_a_bet()
-
-        # Player and Dealer first two cards
-        for _ in range(2):
-            player.add_card_to_hand(deck.draw_card())
-            dealer.add_card_to_hand(deck.draw_card())
-
-        # Showing the starting Hands
-        player.show_hand()
-        dealer.show_hand()
-
-        # Ask Player draw card
-        while True:
-            try:
-                draw = input("Do you want to draw another card? (yes/no): ").lower()
-                if draw not in ['yes', 'no']:
-                    raise ValueError("Invalid input. Please enter 'yes' or 'no'.")
-                
-                if draw == 'yes':
-                    player.add_card_to_hand(deck.draw_card())
-                    player.show_hand()
-                    if player.hand_value() > 21:                
+            while True:
+                print("\nUnder which name do you want to be referred to? Please enter below:")
+                try:
+                    player_name = input()
+                    if validate_player_name(player_name):
+                        player = Player(player_name)
+                        dealer = Dealer("Oscar")
                         break
-                elif draw == 'no':
-                    break
+                    else:
+                        raise ValueError("Invalid name. Please enter a valid name with only letters and at most 20 characters.")
+                except ValueError as e:
+                    print(str(e))
 
-            except ValueError as e:
-                print(str(e) + "\n")
-
-        # Dealer draws cards
-        while dealer.hand_value()<17 and not(player.hand_value()>21):
-            dealer.add_card_to_hand(deck.draw_card())
-
-        # Show final hands
-        print("\nRESULTS:\n")
-        print(f"{player.name}'s hand value: {player.hand_value()}")
-        player.show_hand()
-        print("Dealer's hand value:", dealer.hand_value())
-        dealer.show_hand(False)
-
-        # Show Winner
-        if dealer.hand_value() > 21:
-            print(f"Player: {player.name} won!\n")
-            player.round_won()
-        elif player.hand_value() > 21:
-            print(f"Dealer: {dealer.name} won!\n")
-            player.round_lost()
-        elif dealer.hand_value()<player.hand_value() and not(player.hand_value()>21):
-            print(f"Player: {player.name} won!\n")
-            player.round_won()
-        elif dealer.hand_value()>player.hand_value() and not(dealer.hand_value()>21):
-            print(f"Dealer: {dealer.name} won!\n") 
-            player.round_lost()     
-        elif dealer.hand_value()==player.hand_value():
-            print(f"It's a draw!\n")
-        
+        # Start round    
+        deck = Deck()
+        start_round(player, dealer, deck)           
         first_round = False
 
         # Ask Player if he wants to keep playing
-        if player.credits>0:
-            print(f"\nDo you want to play another round or leave the table with {player.credits} $.\nType play to play or random character to leave.")
-            player_choice = input()
-            if player_choice == "play":
-                pass
-            else:
-                break
-        else:
-            print("You got no money left to play. Start a new game to start again with 1000$.")
+        if not continue_play_option(player):
             break
 
 def main():
     run_game()
-### docstrings
+
 main()
 
