@@ -112,12 +112,12 @@ class Player(Participant):
                 user_input = input("Enter your bet: \n")
                 bet = int(user_input)
                 if bet < 1 or bet > self.credits:
-                    raise ValueError(f"Invalid bet. Please enter a positive integer between 1 and {self.credits}.\n")
+                    raise ValueError(f"\nInvalid bet. Please enter a positive integer between 1 and {self.credits}.\n")
                 
                 self.bet = bet
                 break
             except ValueError:
-                print(f"Invalid input. Please enter a valid positive integer between 1 and {self.credits}.\n")
+                print(f"\nInvalid input. Please enter a valid positive integer between 1 and {self.credits}.\n")
 
     def round_won(self):
         self.credits += self.bet*2
@@ -141,37 +141,40 @@ class Dealer(Participant):
         else:
             super().show_hand()
 
-def main():
+def run_game():
+    # Enter Game/Black Jack Table
     first_round = True
-    player_name = ""
+
     while True:
-        ### Test Game
         if first_round == True:   
             print("\nWelcome to the Black Jack Table. You're entering with a total credit of 1000 $.\n")
             print("\nUnder which name do you want to be referred to? Please enter below:")
             player_name = input()
+            player = Player(player_name)
+            dealer = Dealer("Oscar")
         else:
             print("\nWelcome to the next round at the Black Jack Table.")
-
-        deck_one = Deck()
-        deck_one.shuffle()
-
-        player = Player(player_name)
-        dealer = Dealer("Oscar")
-
-        # place a bet
+            for _ in range(len(player.hand)):
+                player.hand.pop()
+            for _ in range(len(dealer.hand)):
+                dealer.hand.pop()
+            
+        deck = Deck()
+        deck.shuffle()
+ 
+        # Ask to place a bet
         player.place_a_bet()
 
-        # every player gets two cards
+        # Player and Dealer first two cards
         for _ in range(2):
-            player.add_card_to_hand(deck_one.draw_card())
-            dealer.add_card_to_hand(deck_one.draw_card())
+            player.add_card_to_hand(deck.draw_card())
+            dealer.add_card_to_hand(deck.draw_card())
 
-        # showing starting hands
+        # Showing the starting Hands
         player.show_hand()
         dealer.show_hand()
 
-        # Player draw card Option
+        # Ask Player draw card
         while True:
             try:
                 draw = input("Do you want to draw another card? (yes/no): ").lower()
@@ -179,7 +182,7 @@ def main():
                     raise ValueError("Invalid input. Please enter 'yes' or 'no'.")
                 
                 if draw == 'yes':
-                    player.add_card_to_hand(deck_one.draw_card())
+                    player.add_card_to_hand(deck.draw_card())
                     player.show_hand()
                     if player.hand_value() > 21:                
                         break
@@ -191,7 +194,7 @@ def main():
 
         # Dealer draws cards
         while dealer.hand_value()<17 and not(player.hand_value()>21):
-            dealer.add_card_to_hand(deck_one.draw_card())
+            dealer.add_card_to_hand(deck.draw_card())
 
         # Show final hands
         print("\nRESULTS:\n")
@@ -218,14 +221,20 @@ def main():
         
         first_round = False
 
-        print(f"\nDo you want to play another round or leave the table with {player.credits} $.\nType play to play or random character to leave.")
-        player_choice = input()
-        if player_choice == "play":
-            pass
+        # Ask Player if he wants to keep playing
+        if player.credits>0:
+            print(f"\nDo you want to play another round or leave the table with {player.credits} $.\nType play to play or random character to leave.")
+            player_choice = input()
+            if player_choice == "play":
+                pass
+            else:
+                break
         else:
+            print("You got no money left to play. Start a new game to start again with 1000$.")
             break
-            
-        ### finish doc on class and functions
+
+def main():
+    run_game()
 
 main()
 
