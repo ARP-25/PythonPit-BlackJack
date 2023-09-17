@@ -1,5 +1,5 @@
 import random
-
+import re
 class Card:
     """
     Represents a playing card.
@@ -214,14 +214,14 @@ class Player(Participant):
         Update the player's credits after winning a round.
         """
         self.credits += self.bet*2
-        print(f"{self.name} has won {self.bet*2} $.\n{self.name} has {self.credits} $ left in the bank.")
+        print(f"{self.name} has won {self.bet*2} $.\n{self.name} has now {self.credits} $ left in the bank.")
 
     def round_lost(self):
         """
         Update the player's credits after losing a round.
         """
         self.credits -= self.bet
-        print(f"{self.name} has lost {self.bet} $.\n{self.name} has {self.credits} $ left in the bank.")
+        print(f"{self.name} has lost {self.bet} $.\n{self.name} has now {self.credits} $ left in the bank.")
 
 class Dealer(Participant):
     """
@@ -411,10 +411,10 @@ def validate_player_name(name):
     bool: True if the name is valid, False otherwise.
     """
     return bool(re.match(r'^[a-zA-Z]{1,20}$', name))
-
+    
 def run_game():
     """
-    Run a round of the blackjack game.
+    Run the Blackjack Game.
 
     This function manages the flow of a round of the blackjack game, including initializing the game,
     allowing the player to place a bet, dealing cards to the player and dealer,
@@ -428,8 +428,8 @@ def run_game():
     """
     first_round = True
     while True:
-        # Welcome message, initialize Participants
-        if first_round == True:   
+        # Welcome message, initialize Participants, validate Input
+        if first_round:
             print("\nWelcome to the Black Jack Table. You're entering with a total credit of 1000 $.\n")
             while True:
                 print("\nUnder which name do you want to be referred to? Please enter below:")
@@ -444,7 +444,15 @@ def run_game():
                 except ValueError as e:
                     print(str(e))
 
-        # Start round    
+        # Welcome message, clear Participants hands
+        else:
+            print("\nWelcome to the next round at the Black Jack Table.")
+            for _ in range(len(player.hand)):
+                player.hand.pop()
+            for _ in range(len(dealer.hand)):
+                dealer.hand.pop()
+
+        # Initialize Deck and start round    
         deck = Deck()
         start_round(player, dealer, deck)           
         first_round = False
