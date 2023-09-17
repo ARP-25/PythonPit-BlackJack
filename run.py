@@ -2,22 +2,59 @@ import random
 
 class Card:
     """
+    Represents a playing card.
+
+    Attributes:
+    - symbol (str): The symbol of the card (e.g., Hearts, Diamonds, Clubs, Spades).
+    - value (int): The value of the card.
+    - logo (str): The logo or identifier of the card (e.g., Ace, King, Queen, numbers).
+
+    Methods:
+    - __init__(symbol, value, logo): Initializes a Card instance.
+    - __str__(): Returns a string representation of the card.
 
     """
     def __init__(self, symbol, value, logo):
+        """
+        Initialize a playing card.
+
+        Parameters:
+        - symbol (str): The symbol of the card (e.g., Hearts, Diamonds, Clubs, Spades).
+        - value (int): The value of the card.
+        - logo (str): The logo or identifier of the card (e.g., Ace, King, Queen, numbers).
+        """
         self.symbol = symbol
         self.value = value       
         self.logo = logo
 
     def __str__(self):
+        """
+        Return a string representation of the card.
+
+        Returns:
+        str: A string describing the card, including its symbol and logo.
+        """
         return f"Card: {self.symbol} {self.logo}"
 
 class Deck:
     """
+    Represents a deck of playing cards.
 
+    Attributes:
+    - cards (list): A list of Card objects representing the deck of cards.
+
+    Methods:
+    - __init__(): Initializes a Deck instance with a standard deck of cards.
+    - print_cards(): Prints the number of cards in the deck and details of each card.
+    - shuffle(): Shuffles the deck of cards.
+    - draw_card(): Draws a card from the deck.
     """
     def __init__(self):
         """
+        Initialize a deck of playing cards.
+        Creates a standard deck of cards.
+
+        The deck is created with 52 cards, including all four symbols and various values.
 
         """
         self.cards = []
@@ -33,7 +70,7 @@ class Deck:
 
     def print_cards(self):
         """
-
+        Print the number of cards in the deck and details of each card.
         """
         print(len(self.cards))
         for card in self.cards:
@@ -41,13 +78,16 @@ class Deck:
 
     def shuffle(self):
         """
-
+        Shuffle the deck of cards.
         """
         random.shuffle(self.cards)
 
     def draw_card(self):
         """
+        Draw a card from the deck.
 
+        Returns:
+        Card: A Card object representing the drawn card.
         """
         if len(self.cards)>0:
             return self.cards.pop()
@@ -56,23 +96,40 @@ class Deck:
 
 class Participant:
     """
+    Represents a participant in the blackjack game.
 
+    Attributes:
+    - name (str): The name of the participant.
+    - hand (list): A list of Card objects representing the participant's hand.
+
+    Methods:
+    - __init__(name): Initializes a Participant instance with the given name and an empty hand.
+    - add_card_to_hand(card): Adds a Card object to the participant's hand.
+    - show_hand(): Displays the participant's hand.
+    - hand_value(): Calculates and returns the value of the participant's hand.
     """
     def __init__(self, name):
         """
+        Initialize a participant in the blackjack game.
+
+        Parameters:
+        - name (str): The name of the participant.
         """
         self.name = name
         self.hand = []
 
     def add_card_to_hand(self, card):
         """
+        Add a Card object to the participant's hand.
 
+        Parameters:
+        - card (Card): A Card object to be added to the hand.
         """
         self.hand.append(card)
 
     def show_hand(self):
         """
-
+        Display the participant's hand.
         """
         print(f"\n{self.name}'s hand: ")
         for card in self.hand:
@@ -81,7 +138,10 @@ class Participant:
     
     def hand_value(self):
         """
+        Calculate the value of the participant's hand.
 
+        Returns:
+        int: The total value of the participant's hand.
         """
         hand_value = sum(card.value for card in self.hand)
 
@@ -94,8 +154,30 @@ class Participant:
         return hand_value
 
 class Player(Participant):
+    """
+    Represents a player in the blackjack game, inheriting from the Participant class.
+
+    Attributes:
+    - name (str): The name of the player.
+    - hand (list): A list of Card objects representing the player's hand.
+    - bet (int): The bet amount placed by the player.
+    - credits (int): The total credits the player has.
+
+    Methods:
+    - __init__(name, bet, credits): Initializes a Player instance with the given name, bet, and credits.
+    - print_credits(): Prints the current credit balance of the player.
+    - place_a_bet(): Prompts the player to place a bet.
+    - round_won(): Updates the player's credits after winning a round.
+    - round_lost(): Updates the player's credits after losing a round.
+    """
     def __init__(self, name, bet = 0, credits = 1000):
         """
+        Initialize a player for the blackjack game.
+
+        Parameters:
+        - name (str): The name of the player.
+        - bet (int, optional): The initial bet amount. Defaults to 0.
+        - credits (int, optional): The initial credits of the player. Defaults to 1000.
         """
         self.name = name
         self.hand = []
@@ -103,9 +185,17 @@ class Player(Participant):
         self.credits = credits
 
     def print_credits(self):
+        """
+        Print the current credit balance of the player.
+        """
         print(f"{self.name} has {self.credits} $.\n")
 
     def place_a_bet(self):      
+        """
+        Prompt the player to place a bet for the round.
+
+        Validates the input to ensure a valid bet is placed.
+        """
         while True:
             try:
                 print(f"\nHow much money do you want to bet in this round?\nYou can bet up to {self.credits} $ right now.\n")
@@ -120,17 +210,36 @@ class Player(Participant):
                 print(f"\nInvalid input. Please enter a valid positive integer between 1 and {self.credits}.\n")
 
     def round_won(self):
+        """
+        Update the player's credits after winning a round.
+        """
         self.credits += self.bet*2
         print(f"{self.name} has won {self.bet*2} $.\n{self.name} has {self.credits} $ left in the bank.")
 
     def round_lost(self):
+        """
+        Update the player's credits after losing a round.
+        """
         self.credits -= self.bet
         print(f"{self.name} has lost {self.bet} $.\n{self.name} has {self.credits} $ left in the bank.")
 
 class Dealer(Participant):
+    """
+    Represents the dealer in the blackjack game, inheriting from the Participant class.
+
+    Attributes:
+    - name (str): The name of the dealer.
+    - hand (list): A list of Card objects representing the dealer's hand.
+
+    Methods:
+    - show_hand(first_card_secret=True): Displays the dealer's hand.
+    """
     def show_hand(self, first_card_secret = True):
         """
+        Display the dealer's hand.
 
+        Parameters:
+        - first_card_secret (bool, optional): Whether to keep the first card secret or not. Defaults to True.
         """
         if first_card_secret == True:
             print(f"{self.name}'s hand: ")
@@ -142,7 +251,19 @@ class Dealer(Participant):
             super().show_hand()
 
 def run_game():
-    # Enter Game/Black Jack Table
+    """
+    Run a round of the blackjack game.
+
+    The function manages the flow of a round of the blackjack game, including initializing the game,
+    allowing the player to place a bet, dealing cards to the player and dealer,
+    managing the player's turn, managing the dealer's turn, determining the winner of the round,
+    and updating the player's credits accordingly.
+
+    The function also allows the player to continue playing more rounds or exit the game.
+
+    Returns:
+    None
+    """
     first_round = True
 
     while True:
@@ -235,6 +356,6 @@ def run_game():
 
 def main():
     run_game()
-
+### docstrings
 main()
 
