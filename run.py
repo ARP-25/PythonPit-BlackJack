@@ -94,7 +94,39 @@ class Participant:
         return hand_value
 
 class Player(Participant):
-    pass
+    def __init__(self, name, bet = 0, credits = 1000):
+        """
+        """
+        self.name = name
+        self.hand = []
+        self.bet = 0
+        self.credits = credits
+
+    def print_credits(self):
+        print(f"{self.name} has {self.credits} $.\n")
+
+    def place_a_bet(self):
+        max_bet = int(self.credits/2)       
+        while True:
+            try:
+                print(f"How much money do you want to bet in this round?\nYou can bet a total of {max_bet} $")
+                user_input = input("Enter your bet: ")
+                bet = int(user_input)
+                if bet < 1 or bet > max_bet:
+                    raise ValueError(f"Invalid bet. Please enter a positive integer between 1 and {max_bet}.")
+                
+                self.bet = bet
+                break
+            except ValueError:
+                print(f"Invalid input. Please enter a valid positive integer between 1 and {max_bet}.")
+
+    def round_won(self):
+        self.credits += self.bet*2
+        print(f"{self.name} has won {self.bet*2} $.\n{self.name} has {self.credits} $ left in the bank.")
+
+    def round_lost(self):
+        self.credits -= self.bet*2
+        print(f"{self.name} has lost {self.bet*2} $.\n{self.name} has {self.credits} $ left in the bank.")
 
 class Dealer(Participant):
     def show_hand(self, first_card_secret = True):
@@ -157,6 +189,9 @@ def main():
     player = Player("Ronaldo")
     dealer = Dealer("Bestdealer")
 
+    # place a bet
+    player.place_a_bet()
+
     # every player gets two cards
     for _ in range(2):
         player.add_card_to_hand(deck_one.draw_card())
@@ -168,20 +203,24 @@ def main():
 
     # Player draw card Option
     while True:
-        draw = input("Do you want to draw a card? (yes/no): \n").lower()
-        if draw == 'yes':
-            player.add_card_to_hand(deck_one.draw_card())
-            player.show_hand()
-            if player.hand_value() > 21:
-                print("You lost! You have more than 21 points.")
+        try:
+            draw = input("Do you want to draw a card? (yes/no): ").lower()
+            if draw not in ['yes', 'no']:
+                raise ValueError("Invalid input. Please enter 'yes' or 'no'.")
+            
+            if draw == 'yes':
+                player.add_card_to_hand(deck_one.draw_card())
+                player.show_hand()
+                if player.hand_value() > 21:                
+                    break
+            elif draw == 'no':
                 break
-        elif draw == 'no':
-            break
-        else:
-            print("Invalid input. Please enter 'yes' or 'no'.\n")
+
+        except ValueError as e:
+            print(str(e) + "\n")
 
     # Dealer draws cards
-    while dealer.hand_value() < 17:
+    while dealer.hand_value()<17 and not(player.hand_value()>21):
         dealer.add_card_to_hand(deck_one.draw_card())
 
     # Show final hands
@@ -194,10 +233,16 @@ def main():
     # Show Winner
     if dealer.hand_value() > 21:
         print(f"Player: {player.name} won!")
+        player.round_won()
+    elif player.hand_value() > 21:
+        print(f"Dealer: {dealer.name} won!")
+        player.round_lost()
     elif dealer.hand_value()<player.hand_value() and not(player.hand_value()>21):
         print(f"Player: {player.name} won!")
+        player.round_won()
     elif dealer.hand_value()>player.hand_value() and not(dealer.hand_value()>21):
-        print(f"Dealer: {dealer.name} won!")       
+        print(f"Dealer: {dealer.name} won!") 
+        player.round_lost()     
     elif dealer.hand_value()==player.hand_value():
         print(f"It's a draw!")
     
